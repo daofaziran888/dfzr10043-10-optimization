@@ -17,6 +17,7 @@ from app.services.exception_rule import ExceptionRuleService
 from app.services.retry_policy import RetryPolicyService
 from app.services.capture_batch import CaptureBatchService
 from app.services.field_mapping import FieldMappingService
+from app.services.mapping_activation import MappingActivationService
 from app.services.data_landing import DataLandingService
 from app.services.audit_trail import AuditTrailService
 from app.services.resource_pool import ResourcePoolService
@@ -41,6 +42,7 @@ SERVICES: dict[str, BaseModuleService] = {
     "retry_policy": RetryPolicyService(),
     "capture_batch": CaptureBatchService(),
     "field_mapping": FieldMappingService(),
+    "mapping_activation": MappingActivationService(),
     "data_landing": DataLandingService(),
     "audit_trail": AuditTrailService(),
     "resource_pool": ResourcePoolService(),

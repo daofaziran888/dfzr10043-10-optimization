@@ -168,6 +168,17 @@ export const MODULES: ModuleMeta[] = [
     metrics: ["映射总数", "已生效映射", "试算中映射"],
   },
   {
+    key: "mapping_activation",
+    name: "生效清单",
+    entity: "生效清单",
+    desc: "字段映射批量生效的核对清单：记录每条映射的试算结果、同列冲突裁决与生效版本，供数据落库逐列核对。",
+    fields: ["清单编号", "提交指纹", "提交映射数", "生效映射数", "冲突数", "生成时间"],
+    statuses: ["生效中", "已生效", "已作废"],
+    actions: ["作废清单"],
+    actionTargets: {"作废清单": "已作废"},
+    metrics: ["清单总数", "已生效清单", "已作废清单"],
+  },
+  {
     key: "data_landing",
     name: "数据落库",
     entity: "落库记录",

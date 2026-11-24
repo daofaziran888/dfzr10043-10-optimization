@@ -202,11 +202,14 @@ def collect_files_and_land_data(run_id: int, file_payloads: list[dict[str, Any]]
     batch_svc.run_action(batch_result["id"], "启动校验")
     batch_svc.run_action(batch_result["id"], "确认批次")
 
-    # 字段映射生效
+    # 字段映射批量生效：按实际采集记录试算、同列冲突裁决，生成生效清单
     mapping_svc = service_for("field_mapping")
-    for mid in mapping_ids:
-        mapping_svc.run_action(mid, "提交试算")
-        mapping_svc.run_action(mid, "生效映射")
+    activation = None
+    if mapping_ids:
+        activation = mapping_svc.batch_activate(
+            mapping_ids,
+            records=[dict(fp) for fp in file_payloads],
+        )
 
     # 数据落库（含水位推进）
     landing_svc = service_for("data_landing")
@@ -225,6 +228,9 @@ def collect_files_and_land_data(run_id: int, file_payloads: list[dict[str, Any]]
         "完成时间": _now_iso(),
     }
     landing_result, _ = landing_svc.create_entry(landing_values)
+    if activation and activation.get("生效映射数"):
+        # 落库记录关联生效清单，供下游逐列核对映射版本
+        landing_svc.get_entry(landing_result["id"])["生效清单"] = activation["清单编号"]
     landing_svc.run_action(landing_result["id"], "启动写入")
     if conflict_rows == 0:
         landing_svc.run_action(landing_result["id"], "确认写入")
@@ -254,6 +260,7 @@ def collect_files_and_land_data(run_id: int, file_payloads: list[dict[str, Any]]
         "handoff_id": handoff_result["id"],
         "conflict_rows": conflict_rows,
         "watermark": watermark,
+        "activation_manifest": activation["清单编号"] if activation else None,
     }
 
 
